@@ -1,60 +1,26 @@
 # ImageToGLB
 
-Aplicativo web para transformar uma imagem em um modelo 3D **GLB**, acompanhar a geração, visualizar o resultado no navegador e baixar uma versão pronta para edição ou rig.
+Conversor gratuito de imagem para **GLB 2.5D**, executado inteiramente no navegador.
 
-## O que já está implementado
+## O que funciona sem API
 
-- Upload por clique ou arrastar e soltar.
-- Otimização da imagem no navegador antes do envio.
-- Geração real de modelo 3D por imagem usando a API da Tripo AI.
-- Modos rápido, equilibrado e low-poly para jogos.
-- Textura PBR opcional.
-- Progresso da geração em tempo real por consulta da tarefa.
-- Visualizador 3D interativo com rotação, zoom e iluminação.
-- Download do GLB sem rig, indicado para importação no AccuRig.
-- Geração opcional de uma segunda versão com rig humanoide.
-- Chave da API protegida no servidor.
-- Layout responsivo para computador e celular.
+- Upload de PNG, JPG e WebP.
+- Processamento local: a imagem não é enviada para servidor.
+- Geração de malha com frente texturizada, espessura, parte traseira e relevo por luminosidade.
+- Três níveis de detalhamento da geometria.
+- Remoção opcional de fundo claro.
+- Visualização 3D no navegador.
+- Download do GLB pronto para Blender, editores 3D e engines.
+- Publicação automática no GitHub Pages pelo GitHub Actions.
 
-## Configuração
+## Limitação real
 
-1. Crie uma chave de API na plataforma Tripo AI.
-2. No projeto da Vercel, abra **Settings → Environment Variables**.
-3. Adicione:
+Esta versão cria um objeto 2.5D, semelhante a um recorte com volume e relevo. Uma única imagem não contém informações suficientes para reconstruir corretamente costas, laterais e partes escondidas de um personagem. Uma reconstrução 3D completa exige um modelo de IA pesado executado em GPU ou um serviço externo.
 
-```env
-TRIPO_API_KEY=tsk_sua_chave_aqui
-```
+O GLB gerado pode ser editado no Blender, mas não é um personagem humanoide volumétrico adequado para rig automático no AccuRig.
 
-4. Faça um novo deploy.
+## Produção
 
-A chave nunca é enviada ao navegador. A imagem é encaminhada pelo servidor diretamente ao provedor de geração 3D.
+O workflow `.github/workflows/pages.yml` valida e publica o conteúdo estático do branch `main` no GitHub Pages.
 
-## Desenvolvimento local
-
-O projeto usa arquivos estáticos e funções serverless da Vercel. Com a Vercel CLI instalada:
-
-```bash
-vercel dev
-```
-
-Crie um `.env.local` com `TRIPO_API_KEY` para testar a geração.
-
-## Estrutura
-
-```text
-index.html          Interface principal
-styles.css          Design responsivo
-app.js              Upload, progresso, preview e download
-api/generate.js     Upload da imagem e criação da tarefa 3D
-api/task.js         Consulta de progresso e resultado
-api/rig.js          Criação opcional de rig humanoide
-api/download.js     Atualiza o link temporário e redireciona o download
-api/status.js       Verifica se o servidor está configurado
-```
-
-## Limitações reais
-
-A reconstrução usa uma única imagem. Partes escondidas, costas, laterais e detalhes cobertos precisam ser estimados pela IA e podem não ficar idênticos à referência. Para personagens destinados ao AccuRig, a melhor entrada é uma imagem frontal de corpo inteiro, com braços afastados, pernas separadas, fundo simples e poucos acessórios.
-
-Os arquivos gerados e o consumo de créditos dependem da conta configurada no provedor 3D.
+Para a primeira publicação, o repositório deve usar **Settings → Pages → Source → GitHub Actions**.
