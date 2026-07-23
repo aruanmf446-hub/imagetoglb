@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Converta uma imagem em um modelo 3D GLB, visualize no navegador e prepare o arquivo para rig." />
+    <meta name="theme-color" content="#0b0c10" />
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <title>ImageToGLB — Imagem para modelo 3D</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="ImageToGLB">
+        <img src="/assets/logo.svg" alt="" width="40" height="40" />
+        <span>
+          <strong>ImageToGLB</strong>
+          <small>Imagem para modelo 3D</small>
+        </span>
+      </a>
+      <div class="provider-status" id="providerStatus" aria-live="polite">
+        <span class="status-dot"></span>
+        <span>Verificando gerador 3D…</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">GERAÇÃO 3D COM IA</div>
+        <h1>Transforme uma imagem em <span>GLB.</span></h1>
+        <p>Envie uma imagem de corpo inteiro, acompanhe a criação do modelo e baixe o arquivo pronto para visualizar, editar ou levar ao AccuRig.</p>
+      </section>
+
+      <section class="workspace">
+        <div class="panel controls-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">01</span>
+              <h2>Imagem de referência</h2>
+            </div>
+            <button class="ghost-button" id="resetButton" type="button" hidden>Limpar</button>
+          </div>
+
+          <label class="drop-zone" id="dropZone" for="imageInput">
+            <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+            <div class="drop-empty" id="dropEmpty">
+              <div class="upload-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <strong>Solte a imagem aqui</strong>
+              <span>ou clique para escolher</span>
+              <small>PNG, JPG ou WebP · até 10 MB</small>
+            </div>
+            <img id="imagePreview" alt="Prévia da imagem selecionada" hidden />
+            <div class="image-overlay" id="imageOverlay" hidden>
+              <span>Trocar imagem</span>
+            </div>
+          </label>
+
+          <div class="tips">
+            <strong>Para um personagem melhor</strong>
+            <div class="tip-grid">
+              <span>Corpo inteiro visível</span>
+              <span>Vista frontal</span>
+              <span>Braços separados</span>
+              <span>Fundo simples</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="panel-heading compact">
+            <div>
+              <span class="step-number">02</span>
+              <h2>Qualidade do modelo</h2>
+            </div>
+          </div>
+
+          <div class="quality-options" role="radiogroup" aria-label="Qualidade do modelo">
+            <label class="quality-card">
+              <input type="radio" name="quality" value="fast" />
+              <span class="quality-copy"><strong>Rápido</strong><small>Teste e protótipo</small></span>
+              <span class="quality-badge">Turbo</span>
+            </label>
+            <label class="quality-card selected">
+              <input type="radio" name="quality" value="balanced" checked />
+              <span class="quality-copy"><strong>Equilibrado</strong><small>Melhor escolha geral</small></span>
+              <span class="quality-badge recommended">Recomendado</span>
+            </label>
+            <label class="quality-card">
+              <input type="radio" name="quality" value="game" />
+              <span class="quality-copy"><strong>Game low-poly</strong><small>Mais leve para jogos</small></span>
+              <span class="quality-badge">P1</span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <strong>Textura PBR detalhada</strong>
+              <small>Mais definição de materiais e superfície</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="pbrInput" checked />
+              <span></span>
+            </label>
+          </div>
+
+          <button class="primary-button" id="generateButton" type="button" disabled>
+            <span class="button-label">Gerar modelo GLB</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="privacy-note">Sua imagem é enviada somente ao serviço de geração 3D e não é salva neste projeto.</p>
+        </div>
+
+        <div class="panel preview-panel">
+          <div class="preview-toolbar">
+            <div>
+              <span class="step-number">03</span>
+              <h2>Resultado 3D</h2>
+            </div>
+            <span class="format-pill">.GLB</span>
+          </div>
+
+          <div class="viewer-shell" id="viewerShell">
+            <div class="viewer-placeholder" id="viewerPlaceholder">
+              <div class="cube-stage" aria-hidden="true">
+                <div class="wire-cube">
+                  <span class="face front"></span><span class="face back"></span><span class="face right"></span><span class="face left"></span><span class="face top"></span><span class="face bottom"></span>
+                </div>
+              </div>
+              <strong>Seu modelo aparecerá aqui</strong>
+              <span>Você poderá girar, aproximar e inspecionar o GLB.</span>
+            </div>
+
+            <div class="generation-progress" id="generationProgress" hidden>
+              <div class="spinner"></div>
+              <strong id="progressTitle">Preparando imagem…</strong>
+              <span id="progressMessage">Iniciando a geração do modelo.</span>
+              <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+              <small id="progressPercent">0%</small>
+            </div>
+
+            <model-viewer id="modelViewer" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="1" environment-image="neutral" auto-rotate rotation-per-second="18deg" hidden></model-viewer>
+          </div>
+
+          <div class="result-summary" id="resultSummary" hidden>
+            <div class="result-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div><strong>Modelo concluído</strong><small id="resultMeta">GLB com textura pronto para baixar</small></div>
+          </div>
+
+          <div class="action-grid" id="actionGrid" hidden>
+            <a class="primary-button download-button" id="downloadButton" href="#">
+              <span>Baixar GLB</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <button class="secondary-button" id="rigButton" type="button">
+              <span>Gerar versão rigada</span>
+              <small>Opcional</small>
+            </button>
+          </div>
+
+          <div class="error-card" id="errorCard" hidden>
+            <strong>Não foi possível concluir</strong>
+            <p id="errorMessage"></p>
+            <button class="ghost-button" id="retryButton" type="button">Tentar novamente</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="how-it-works">
+        <div><span>1</span><strong>Envie</strong><p>Escolha uma imagem nítida do personagem.</p></div>
+        <div><span>2</span><strong>Gere</strong><p>A IA reconstrói geometria, textura e volume.</p></div>
+        <div><span>3</span><strong>Baixe</strong><p>Visualize e exporte o resultado em GLB.</p></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>ImageToGLB</span>
+      <span>Resultados variam conforme a imagem de referência.</span>
+    </footer>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
