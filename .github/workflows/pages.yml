@@ -1,0 +1,47 @@
+name: Publicar ImageToGLB
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  validate-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v6
+
+      - name: Validar JavaScript
+        run: node --check app.js
+
+      - name: Preparar site estático
+        run: |
+          mkdir -p _site
+          cp index.html styles.css app.js _site/
+          cp -R assets _site/assets
+          touch _site/.nojekyll
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar arquivos do site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Publicar em produção
+        id: deployment
+        uses: actions/deploy-pages@v4
