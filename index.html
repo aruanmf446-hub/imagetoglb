@@ -3,46 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Converta uma imagem em um modelo 3D GLB, visualize no navegador e prepare o arquivo para rig." />
+    <meta name="description" content="Converta uma imagem em GLB 2.5D diretamente no navegador, sem API, conta ou envio para servidores." />
     <meta name="theme-color" content="#0b0c10" />
-    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://unpkg.com" />
-    <title>ImageToGLB — Imagem para modelo 3D</title>
-    <link rel="stylesheet" href="/styles.css" />
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <link rel="icon" href="./assets/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://ajax.googleapis.com" />
+    <link rel="preconnect" href="https://esm.sh" />
+    <title>ImageToGLB — conversor gratuito no navegador</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
   </head>
   <body>
     <div class="ambient ambient-one"></div>
     <div class="ambient ambient-two"></div>
 
     <header class="topbar">
-      <a class="brand" href="/" aria-label="ImageToGLB">
-        <img src="/assets/logo.svg" alt="" width="40" height="40" />
-        <span>
-          <strong>ImageToGLB</strong>
-          <small>Imagem para modelo 3D</small>
-        </span>
+      <a class="brand" href="./" aria-label="ImageToGLB">
+        <img src="./assets/logo.svg" alt="" width="40" height="40" />
+        <span><strong>ImageToGLB</strong><small>Imagem para GLB local</small></span>
       </a>
-      <div class="provider-status" id="providerStatus" aria-live="polite">
+      <div class="provider-status online" id="providerStatus" aria-live="polite">
         <span class="status-dot"></span>
-        <span>Verificando gerador 3D…</span>
+        <span>100% local · sem API</span>
       </div>
     </header>
 
     <main class="shell">
       <section class="hero">
-        <div class="eyebrow">GERAÇÃO 3D COM IA</div>
+        <div class="eyebrow">CONVERSÃO GRATUITA NO NAVEGADOR</div>
         <h1>Transforme uma imagem em <span>GLB.</span></h1>
-        <p>Envie uma imagem de corpo inteiro, acompanhe a criação do modelo e baixe o arquivo pronto para visualizar, editar ou levar ao AccuRig.</p>
+        <p>Crie um modelo 2.5D com textura, espessura e relevo sem conta, sem chave e sem enviar sua imagem para nenhum servidor.</p>
       </section>
+
+      <aside class="truth-note">
+        <strong>O que esta versão faz de verdade</strong>
+        <p>Ela transforma a imagem em uma malha com volume e relevo. Não inventa costas, laterais ou partes escondidas como uma IA de reconstrução 3D completa.</p>
+      </aside>
 
       <section class="workspace">
         <div class="panel controls-panel">
           <div class="panel-heading">
-            <div>
-              <span class="step-number">01</span>
-              <h2>Imagem de referência</h2>
-            </div>
+            <div><span class="step-number">01</span><h2>Imagem de referência</h2></div>
             <button class="ghost-button" id="resetButton" type="button" hidden>Limpar</button>
           </div>
 
@@ -54,93 +54,88 @@
               </div>
               <strong>Solte a imagem aqui</strong>
               <span>ou clique para escolher</span>
-              <small>PNG, JPG ou WebP · até 10 MB</small>
+              <small>PNG, JPG ou WebP · até 15 MB</small>
             </div>
             <img id="imagePreview" alt="Prévia da imagem selecionada" hidden />
-            <div class="image-overlay" id="imageOverlay" hidden>
-              <span>Trocar imagem</span>
-            </div>
+            <div class="image-overlay" id="imageOverlay" hidden><span>Trocar imagem</span></div>
           </label>
 
           <div class="tips">
-            <strong>Para um personagem melhor</strong>
+            <strong>Melhor resultado</strong>
             <div class="tip-grid">
-              <span>Corpo inteiro visível</span>
-              <span>Vista frontal</span>
-              <span>Braços separados</span>
-              <span>Fundo simples</span>
+              <span>Fundo transparente</span><span>Corpo inteiro</span><span>Boa iluminação</span><span>Imagem frontal</span>
             </div>
           </div>
 
           <div class="divider"></div>
 
           <div class="panel-heading compact">
-            <div>
-              <span class="step-number">02</span>
-              <h2>Qualidade do modelo</h2>
-            </div>
+            <div><span class="step-number">02</span><h2>Detalhes da malha</h2></div>
           </div>
 
-          <div class="quality-options" role="radiogroup" aria-label="Qualidade do modelo">
+          <div class="quality-options" role="radiogroup" aria-label="Detalhes da malha">
             <label class="quality-card">
-              <input type="radio" name="quality" value="fast" />
-              <span class="quality-copy"><strong>Rápido</strong><small>Teste e protótipo</small></span>
-              <span class="quality-badge">Turbo</span>
+              <input type="radio" name="quality" value="light" />
+              <span class="quality-copy"><strong>Leve</strong><small>Arquivo menor e geração rápida</small></span>
+              <span class="quality-badge">48 × 48</span>
             </label>
             <label class="quality-card selected">
               <input type="radio" name="quality" value="balanced" checked />
-              <span class="quality-copy"><strong>Equilibrado</strong><small>Melhor escolha geral</small></span>
-              <span class="quality-badge recommended">Recomendado</span>
+              <span class="quality-copy"><strong>Equilibrado</strong><small>Boa definição para uso geral</small></span>
+              <span class="quality-badge recommended">96 × 96</span>
             </label>
             <label class="quality-card">
-              <input type="radio" name="quality" value="game" />
-              <span class="quality-copy"><strong>Game low-poly</strong><small>Mais leve para jogos</small></span>
-              <span class="quality-badge">P1</span>
+              <input type="radio" name="quality" value="detailed" />
+              <span class="quality-copy"><strong>Detalhado</strong><small>Mais geometria e arquivo maior</small></span>
+              <span class="quality-badge">160 × 160</span>
+            </label>
+          </div>
+
+          <div class="sliders">
+            <label class="range-setting">
+              <span><strong>Relevo</strong><output id="depthOutput">18%</output></span>
+              <input id="depthInput" type="range" min="0" max="45" value="18" />
+            </label>
+            <label class="range-setting">
+              <span><strong>Espessura</strong><output id="thicknessOutput">8%</output></span>
+              <input id="thicknessInput" type="range" min="2" max="30" value="8" />
             </label>
           </div>
 
           <div class="setting-row">
-            <div>
-              <strong>Textura PBR detalhada</strong>
-              <small>Mais definição de materiais e superfície</small>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="pbrInput" checked />
-              <span></span>
-            </label>
+            <div><strong>Remover fundo claro</strong><small>Deixa branco e cinza-claro transparentes</small></div>
+            <label class="switch"><input type="checkbox" id="removeBackgroundInput" /><span></span></label>
           </div>
 
+          <label class="range-setting compact-range" id="backgroundRange" hidden>
+            <span><strong>Força da remoção</strong><output id="backgroundOutput">88%</output></span>
+            <input id="backgroundInput" type="range" min="55" max="98" value="88" />
+          </label>
+
           <button class="primary-button" id="generateButton" type="button" disabled>
-            <span class="button-label">Gerar modelo GLB</span>
+            <span class="button-label">Criar GLB local</span>
             <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <p class="privacy-note">Sua imagem é enviada somente ao serviço de geração 3D e não é salva neste projeto.</p>
+          <p class="privacy-note">A imagem permanece no seu dispositivo. O processamento acontece no navegador.</p>
         </div>
 
         <div class="panel preview-panel">
           <div class="preview-toolbar">
-            <div>
-              <span class="step-number">03</span>
-              <h2>Resultado 3D</h2>
-            </div>
+            <div><span class="step-number">03</span><h2>Resultado 3D</h2></div>
             <span class="format-pill">.GLB</span>
           </div>
 
           <div class="viewer-shell" id="viewerShell">
             <div class="viewer-placeholder" id="viewerPlaceholder">
-              <div class="cube-stage" aria-hidden="true">
-                <div class="wire-cube">
-                  <span class="face front"></span><span class="face back"></span><span class="face right"></span><span class="face left"></span><span class="face top"></span><span class="face bottom"></span>
-                </div>
-              </div>
+              <div class="cube-stage" aria-hidden="true"><div class="wire-cube"><span class="face front"></span><span class="face back"></span><span class="face right"></span><span class="face left"></span><span class="face top"></span><span class="face bottom"></span></div></div>
               <strong>Seu modelo aparecerá aqui</strong>
-              <span>Você poderá girar, aproximar e inspecionar o GLB.</span>
+              <span>Depois da geração, gire, aproxime e inspecione o GLB.</span>
             </div>
 
             <div class="generation-progress" id="generationProgress" hidden>
               <div class="spinner"></div>
               <strong id="progressTitle">Preparando imagem…</strong>
-              <span id="progressMessage">Iniciando a geração do modelo.</span>
+              <span id="progressMessage">Lendo os pixels no navegador.</span>
               <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
               <small id="progressPercent">0%</small>
             </div>
@@ -149,43 +144,33 @@
           </div>
 
           <div class="result-summary" id="resultSummary" hidden>
-            <div class="result-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div><strong>Modelo concluído</strong><small id="resultMeta">GLB com textura pronto para baixar</small></div>
+            <div class="result-icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div><strong>GLB criado no navegador</strong><small id="resultMeta">Modelo texturizado pronto para baixar</small></div>
           </div>
 
           <div class="action-grid" id="actionGrid" hidden>
-            <a class="primary-button download-button" id="downloadButton" href="#">
+            <a class="primary-button download-button" id="downloadButton" href="#" download>
               <span>Baixar GLB</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <button class="secondary-button" id="rigButton" type="button">
-              <span>Gerar versão rigada</span>
-              <small>Opcional</small>
-            </button>
+            <button class="secondary-button" id="regenerateButton" type="button"><span>Atualizar modelo</span><small>Usar novos ajustes</small></button>
           </div>
 
           <div class="error-card" id="errorCard" hidden>
-            <strong>Não foi possível concluir</strong>
-            <p id="errorMessage"></p>
+            <strong>Não foi possível concluir</strong><p id="errorMessage"></p>
             <button class="ghost-button" id="retryButton" type="button">Tentar novamente</button>
           </div>
         </div>
       </section>
 
       <section class="how-it-works">
-        <div><span>1</span><strong>Envie</strong><p>Escolha uma imagem nítida do personagem.</p></div>
-        <div><span>2</span><strong>Gere</strong><p>A IA reconstrói geometria, textura e volume.</p></div>
-        <div><span>3</span><strong>Baixe</strong><p>Visualize e exporte o resultado em GLB.</p></div>
+        <div><span>1</span><strong>Envie</strong><p>Escolha uma imagem. Nada é enviado para fora do dispositivo.</p></div>
+        <div><span>2</span><strong>Converta</strong><p>O navegador cria geometria, textura, espessura e relevo.</p></div>
+        <div><span>3</span><strong>Baixe</strong><p>Exporte o arquivo GLB para Blender, editores ou jogos.</p></div>
       </section>
     </main>
 
-    <footer>
-      <span>ImageToGLB</span>
-      <span>Resultados variam conforme a imagem de referência.</span>
-    </footer>
-
-    <script type="module" src="/app.js"></script>
+    <footer><span>ImageToGLB</span><span>Conversão local 2.5D · sem API e sem armazenamento.</span></footer>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
